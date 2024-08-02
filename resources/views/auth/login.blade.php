@@ -1,12 +1,4 @@
 <!doctype html>
-<!--
-* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
-* @version 1.0.0-beta20
-* @link https://tabler.io
-* Copyright 2018-2023 The Tabler Authors
-* Copyright 2018-2023 codecalm.net Paweł Kuna
-* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
--->
 <html lang="en">
 
 <head>
@@ -14,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Sign in</title>
-    <!-- CSS files -->
     <link href="{{ url('/dist/css/tabler.min.css') }}" rel="stylesheet" />
     <link href="{{ url('/dist/css/demo.min.css') }}" rel="stylesheet" />
     <style>
@@ -55,15 +46,15 @@
                             <label class="form-label">
                                 Password
                                 <span class="form-label-description">
-                                    <a href="./forgot-password.html">I forgot password</a>
+                                    <a href="">I forgot password</a>
                                 </span>
                             </label>
                             <div class="input-group input-group-flat">
                                 <input type="password" class="form-control" placeholder="Your password" name="password"
-                                    required>
+                                    id="password" required>
                                 <span class="input-group-text">
-                                    <a href="#" class="link-secondary" title="Show password"
-                                        data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                                    <a href="javascript:void(0)" class="link-secondary" title="Show password"
+                                        onclick="togglePassword()"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
                                             height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                             fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -93,8 +84,6 @@
             </div>
         </div>
     </div>
-    <!-- Libs JS -->
-    <!-- Tabler Core -->
     <script src="{{ url('/dist/js/tabler.min.js') }}" defer></script>
     <script src="{{ url('/dist/js/demo.min.js') }}" defer></script>
     <script>
@@ -105,6 +94,16 @@
                 html: '@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach'
             });
         @endif
+
+        function togglePassword() {
+            var passwordField = document.getElementById('password');
+            var passwordFieldType = passwordField.getAttribute('type');
+            if (passwordFieldType === 'password') {
+                passwordField.setAttribute('type', 'text');
+            } else {
+                passwordField.setAttribute('type', 'password');
+            }
+        }
     </script>
 </body>
 

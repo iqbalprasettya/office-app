@@ -32,12 +32,13 @@
             <div class="card">
                 <div class="card-body">
                     <div id="table-default" class="table-responsive">
-                        <input type="text" class="form-control mb-3" id="search" placeholder="Search...">
-                        <table class="table mb-2">
+                        <table id="tableReport" class="table table-bordered mb-2">
                             <thead>
                                 <tr>
-                                    <th><button class="table-sort" data-sort="sort-date">Tanggal</button></th>
-                                    <th><button class="table-sort" data-sort="sort-desc" width="80%">Deskripsi</button></th>
+                                    <th><button class="table-sort" data-sort="sort-date" width="10%">Tanggal</button>
+                                    </th>
+                                    <th><button class="table-sort" data-sort="sort-desc" width="80%">Deskripsi</button>
+                                    </th>
                                     <th><button class="table-sort" data-sort="sort-status">Status</button></th>
                                     <th>Action</th>
                                 </tr>
@@ -45,7 +46,7 @@
                             <tbody class="table-tbody">
                                 @foreach ($reports as $report)
                                     <tr>
-                                        <td class="sort-date">{{ $report->date }}</td>
+                                        <td class="sort-date" width="10%">{{ $report->date }}</td>
                                         <td class="sort-desc" width="80%">
                                             <ul>
                                                 @foreach ($report->jobs as $job)
@@ -69,14 +70,19 @@
                                             </ul>
                                         </td>
                                         <td>
-                                            <a href="{{ route('reports.edit', $report->id) }}"
-                                                class="btn btn-sm btn-warning">Edit</a>
-                                            <form action="{{ route('reports.destroy', $report->id) }}" method="POST"
-                                                class="delete-form" data-id="{{ $report->id }}" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
+                                            <div class="d-flex gap-2">
+                                                <a href="{{ route('reports.edit', $report->id) }}"
+                                                    class="btn btn-sm btn-warning">Edit</a>
+                                                <form id="delete-report-{{ $report->id }}"
+                                                    action="{{ route('reports.destroy', $report->id) }}" method="POST"
+                                                    class="delete-form" data-id="{{ $report->id }}"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete({{ $report->id }})"
+                                                        class="btn btn-sm btn-danger">Delete</button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -257,6 +263,8 @@
     @endif
 
 
+@endsection
+@section('javascript')
     <script>
         @if ($errors->any())
             Swal.fire({
@@ -274,46 +282,26 @@
             });
         @endif
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const list = new List('table-default', {
-                sortClass: 'table-sort',
-                listClass: 'table-tbody',
-                valueNames: ['sort-date', 'sort-desc', 'sort-status'],
-                page: 10,
-                pagination: true,
-            });
+        function confirmDelete(reportId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this Report!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, keep it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-report-' + reportId).submit();
+                }
+            })
+        }
 
-            list.sort('sort-date', {
-                order: "desc"
-            });
-
-            document.getElementById('search').addEventListener('keyup', function(event) {
-                const searchString = event.target.value;
-                list.search(searchString);
-            });
-
-            // Add event listener for delete buttons
-            document.querySelectorAll('.delete-form').forEach(form => {
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault(); // Prevent the default form submission
-
-                    const form = event.target;
-                    const formId = form.getAttribute('data-id');
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You won't be able to revert this!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit(); // Submit the form if confirmed
-                        }
-                    });
-                });
-            });
+        new DataTable('#tableReport, #viewData', {
+            responsive: true,
+            order: [
+                [0, 'desc']
+            ] // Urutkan kolom pertama (Tanggal) dari yang terbaru
         });
     </script>
 @endsection

@@ -61,6 +61,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 </head>
 
 <body>
@@ -243,10 +244,14 @@
     </div>
 
     <!-- Libs JS -->
-    <script src="{{ url('/dist/libs/list.js/dist/list.min.js') }}" defer></script>
+    {{-- <script src="{{ url('/dist/libs/list.js/dist/list.min.js') }}" defer></script> --}}
     <!-- Tabler Core -->
     <script src="{{ url('/dist/js/tabler.min.js') }}" defer></script>
     <script src="{{ url('/dist/js/demo.min.js') }}" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    @yield('javascript')
 
 </body>
 

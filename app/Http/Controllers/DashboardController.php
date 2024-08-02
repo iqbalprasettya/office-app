@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Department;
+use App\Models\Attendance;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -13,12 +15,31 @@ class DashboardController extends Controller
     // Index
     public function index()
     {
+        $todayAttendance = Attendance::where('user_id', Auth::id())
+            ->where('date', now()->toDateString())
+            ->first();
+
+        $attendances = Attendance::where('user_id', Auth::id())->orderBy('date', 'desc')->get();
+
+        // total current time
+        $currentWorkTime = null;
+        if ($todayAttendance && $todayAttendance->check_in !== null) {
+            $now = Carbon::now();
+            if ($todayAttendance->check_out === null) {
+                $diffInSeconds = $now->diffInSeconds(Carbon::parse($todayAttendance->check_in));
+                $currentWorkTime = gmdate('H:i:s', $diffInSeconds);
+            } else {
+                $diffInSeconds = Carbon::parse($todayAttendance->check_out)->diffInSeconds(Carbon::parse($todayAttendance->check_in));
+                $currentWorkTime = gmdate('H:i:s', $diffInSeconds);
+            }
+        }
+
         // if role nya owner
         if (auth()->user()->role == 'owner') {
             $users = User::all();
             $departments = Department::all();
             
-            return view('dashboard.index', compact('users', 'departments'));
+            return view('dashboard.index', compact('users', 'departments', 'attendances', 'todayAttendance', 'currentWorkTime'));
         }
         // jika role nya admin
         if (auth()->user()->role == 'admin') {
@@ -28,12 +49,12 @@ class DashboardController extends Controller
 
             $departments = Department::all();
 
-            return view('dashboard.index', compact('users', 'departments'));
+            return view('dashboard.index', compact('users', 'departments', 'attendances', 'todayAttendance', 'currentWorkTime'));
         }
         // jika role employee
         if (auth()->user()->role == 'employee') {
             $departments = Department::all();
-            return view('dashboard.index', compact('departments'));
+            return view('dashboard.index', compact('departments', 'attendances', 'todayAttendance', 'currentWorkTime'));
         }
     }
 

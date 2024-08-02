@@ -26,13 +26,16 @@ class ChatsController extends Controller
             ->pluck('user_id')
             ->merge(Chat::where('recipient_id', $userId)->pluck('user_id'))
             ->unique()
-            ->filter(fn($id) => $id != $userId)
+            ->filter(fn ($id) => $id != $userId)
             ->values();
 
         // Ambil data pengguna yang telah berinteraksi
-        $users = User::whereIn('id', $chattedUserIds)->get();
+        $chattedUsers = User::whereIn('id', $chattedUserIds)->get();
 
-        return view('chats.index', compact('users'));
+        // Ambil data semua pengguna kecuali pengguna saat ini
+        $allUsers = User::where('id', '!=', $userId)->get();
+
+        return view('chats.index', compact('chattedUsers', 'allUsers', 'chattedUserIds'));
     }
 
     public function fetchMessages($recipientId)
@@ -62,5 +65,4 @@ class ChatsController extends Controller
 
         return response()->json(['status' => 'Message sent successfully!', 'chat' => $chat]);
     }
-    
 }

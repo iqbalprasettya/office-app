@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ChatsController;
+use App\Http\Controllers\AttendanceController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     // dashboard
     Route::middleware('auth')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/toggle', [AttendanceController::class, 'toggleAttendance'])->name('attendances.toggle');
         Route::get('/create', [DashboardController::class, 'create'])->name('create');
         Route::post('/store', [DashboardController::class, 'store'])->name('store');
         Route::get('/edit/{user}', [DashboardController::class, 'edit'])->name('edit');

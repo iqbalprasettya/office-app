@@ -35,27 +35,72 @@
                             </div>
                         </div>
                         <div class="card-body p-0 scrollable" style="max-height: 35rem">
-                            <div class="nav flex-column nav-pills" role="tablist">
-                                @foreach ($users as $user)
-                                    <a href="javascript:void(0)" class="nav-link text-start mw-100 p-3"
-                                        data-recipient-id="{{ $user->id }}" onclick="loadChat({{ $user->id }})">
-                                        <div class="row align-items-center flex-fill">
-                                            <div class="col-auto">
-                                                <span class="avatar"
-                                                    style="background-image: url({{ $user->avatar ? url('avatars/' . e($user->avatar)) : url('avatars/default-avatar.png') }})"></span>
+                            <div class="nav flex-column nav-pills p-2" role="tablist">
+                                <!-- Dropdown toggle for Recent Chats -->
+                                <button class="btn btn-link d-flex justify-content-between align-items-center w-100"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#recentChats"
+                                    aria-expanded="true" aria-controls="recentChats">
+                                    <h4 class="mb-0">Recent Chats</h4>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-2" width="24" height="24"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M6 9l6 6l6 -6" />
+                                    </svg>
+                                </button>
+                                <div id="recentChats" class="collapse show">
+                                    @foreach ($chattedUsers as $user)
+                                        <a href="javascript:void(0)" class="nav-link text-start mw-100 p-3"
+                                            data-recipient-id="{{ $user->id }}" onclick="loadChat({{ $user->id }})">
+                                            <div class="row align-items-center flex-fill">
+                                                <div class="col-auto">
+                                                    <span class="avatar"
+                                                        style="background-image: url({{ $user->avatar ? url('avatars/' . e($user->avatar)) : url('avatars/default-avatar.png') }})"></span>
+                                                </div>
+                                                <div class="col text-body">
+                                                    <div>{{ e($user->name) }}</div>
+                                                </div>
                                             </div>
-                                            <div class="col text-body">
-                                                <div>{{ e($user->name) }}</div>
+                                        </a>
+                                    @endforeach
+                                </div>
+                                <!-- Dropdown toggle for All Users -->
+                                <button class="btn btn-link d-flex justify-content-between align-items-center w-100 mt-3"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#allUsers" aria-expanded="true"
+                                    aria-controls="allUsers">
+                                    <h4 class="mb-0">All Users</h4>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-2" width="24" height="24"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M6 9l6 6l6 -6" />
+                                    </svg>
+                                </button>
+                                <div id="allUsers" class="collapse">
+                                    @foreach ($allUsers as $user)
+                                        <a href="javascript:void(0)" class="nav-link text-start mw-100 p-3"
+                                            data-recipient-id="{{ $user->id }}" onclick="loadChat({{ $user->id }})">
+                                            <div class="row align-items-center flex-fill">
+                                                <div class="col-auto">
+                                                    <span class="avatar"
+                                                        style="background-image: url({{ $user->avatar ? url('avatars/' . e($user->avatar)) : url('avatars/default-avatar.png') }})"></span>
+                                                </div>
+                                                <div class="col text-body">
+                                                    <div>{{ e($user->name) }}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
-                                @endforeach
+                                        </a>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-7 col-xl-9 d-flex flex-column">
                         <div class="card-body scrollable" style="height: 35rem">
                             <div class="chat">
+                                <div class="profile-chat">
+                                    {{--  menampilkan profile yang sedang di chat setiap user memilih  --}}
+                                </div>
                                 <div class="chat-bubbles" id="chat-bubbles">
                                     <!-- Chat messages will be loaded here -->
                                 </div>
@@ -68,9 +113,9 @@
                                 <span class="input-group-text">
                                     <a href="#" class="link-secondary" data-bs-toggle="tooltip"
                                         aria-label="Send message" title="Send message" onclick="sendMessage()">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
-                                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                            stroke-linecap="round" stroke-linejoin="round">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
+                                            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                             <path d="M12 19l9 2l-9 -18l-9 18l9 -2z" />
                                         </svg>
@@ -108,36 +153,36 @@
                         messageElement.innerHTML = `
                             <div class="row align-items-end ${isCurrentUser ? 'justify-content-end' : ''}">
                                 ${isCurrentUser ? `
-                                    <div class="col col-lg-6">
-                                        <div class="chat-bubble ${chatBubbleClass}">
-                                            <div class="chat-bubble-title">
-                                                <div class="row">
-                                                    <div class="col chat-bubble-author">${e(chat.user.name)}</div>
-                                                    <div class="col-auto chat-bubble-date">${formatTime(chat.created_at)}</div>
+                                        <div class="col col-lg-6">
+                                            <div class="chat-bubble ${chatBubbleClass}">
+                                                <div class="chat-bubble-title">
+                                                    <div class="row">
+                                                        <div class="col chat-bubble-author">${e(chat.user.name)}</div>
+                                                        <div class="col-auto chat-bubble-date">${formatTime(chat.created_at)}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="chat-bubble-body">
+                                                    <p>${e(chat.message)}</p>
                                                 </div>
                                             </div>
-                                            <div class="chat-bubble-body">
-                                                <p>${e(chat.message)}</p>
-                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto"><span class="avatar" style="background-image: url('${currentUserAvatar}')"></span></div>
-                                ` : `
-                                    <div class="col-auto"><span class="avatar" style="background-image: url('${chatUserAvatar}')"></span></div>
-                                    <div class="col col-lg-6">
-                                        <div class="${chatBubbleClass}">
-                                            <div class="chat-bubble-title">
-                                                <div class="row">
-                                                    <div class="col chat-bubble-author">${e(chat.user.name)}</div>
-                                                    <div class="col-auto chat-bubble-date">${formatTime(chat.created_at)}</div>
+                                        <div class="col-auto"><span class="avatar" style="background-image: url('${currentUserAvatar}')"></span></div>
+                                    ` : `
+                                        <div class="col-auto"><span class="avatar" style="background-image: url('${chatUserAvatar}')"></span></div>
+                                        <div class="col col-lg-6">
+                                            <div class="${chatBubbleClass}">
+                                                <div class="chat-bubble-title">
+                                                    <div class="row">
+                                                        <div class="col chat-bubble-author">${e(chat.user.name)}</div>
+                                                        <div class="col-auto chat-bubble-date">${formatTime(chat.created_at)}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="chat-bubble-body">
+                                                    <p>${e(chat.message)}</p>
                                                 </div>
                                             </div>
-                                            <div class="chat-bubble-body">
-                                                <p>${e(chat.message)}</p>
-                                            </div>
                                         </div>
-                                    </div>
-                                `}
+                                    `}
                             </div>
                         `;
                         chatBubbles.appendChild(messageElement);
